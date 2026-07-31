@@ -1,81 +1,105 @@
+# IPADownloader
 
+**让下载 iOS IPA 变得更加方便** — 命令行 + 桌面 GUI 双模式。
 
-### IPADownloader 让下载ipa变得更加方便。
+感谢大神：[majd/ipatool](https://github.com/majd/ipatool)
 
-2025.08.27 更新，增加错误解决办法。
+![icon](icon_0.jpg)
 
-此脚本，一键下载，减少逆向学习脑细胞的损耗。
+---
 
-感谢大神，站在大神的肩膀上：https://github.com/majd/ipatool
+## 安装
 
-喜欢请右上角star✨✨
+只需一步（安装 `ipatool`）：
 
-如果下载失败，更换apple id
+```bash
+# macOS
+brew install majd/repo/ipatool
 
-如果搜不到，请修改脚本中的 --limit 20
-
-![img](https://github.com/Tliens/IPADownloader/blob/master/icon_0.jpg)
-
-
-### 使用流程 
-- 执行./setup.sh 安装环境（仅需执行一次）
-  或者:
-```
-brew install ipatool
+# Linux (Ubuntu/Debian) — 下载预编译二进制
+# 见下方 Linux 安装说明
 ```
 
-### 注意事项
-- 如果遇到权限问题 chmod +x *.sh
+或执行：
 
-### 登录苹果账号
-```
-ipatool auth login --email xxx --password xx
+```bash
+chmod +x setup.sh && ./setup.sh
 ```
 
-### 搜素与下载
+---
+
+## 使用方式
+
+### 🖥️ 桌面 GUI（推荐）
+
+```bash
+python3 ipadownloader.py
 ```
-ipatool search xxx
-ipatool download -b com.x.x
+
+功能：
+- 🔍 搜索 App（关键词搜索，50条结果）
+- 📱 列表展示搜索结果
+- ⬇️ 双击或选中后一键下载
+- 🔑 图形界面登录 Apple ID
+- 📂 自定义下载目录
+
+首次使用需登录 Apple ID（窗口左下角按钮）。
+
+---
+
+### 🖥️ 命令行模式
+
+```bash
+# 登录
+ipatool auth login --email xxx --password xxx
+
+# 搜索
+ipatool search "关键词"
+
+# 下载
+ipatool download -b com.example.app
 ```
 
-如果遇到下面错误：
+或使用包装脚本：
+
+```bash
+chmod +x downloader.sh
+./downloader.sh
 ```
-Your Apple ID does not have a license for this app. Download the app on an iOS device to obtain a license.
 
-或者：
+---
 
-ERR error="license is required" success=false
+## 登录 Apple ID
+
+- 使用 GUI：点击左下角 **"🔑 登录 Apple ID"** 按钮
+- 使用 CLI：`ipatool auth login --email xxx --password xxx`
+
+如果密码被拒绝，请在你的 iOS 设备上登录一次该 App，然后再试。
+
+---
+
+## 常见问题
+
+**下载失败：license is required**
 
 ```
-现在设备上下载一个，然后再使用该脚本下载。
+ERR error="license is required"
+```
 
-- OPTIONS:
-  - -b, --bundle-identifier <bundle-identifier>
-      - The bundle identifier of the target iOS app. 
-  - -e, --email <email>     
-    - The email address for the Apple ID. 
-  - -p, --password <password>
-    - The password for the Apple ID. 
-  - --log-level <log-level> (default: info)
-  - --version               Show the version.
-  - -h, --help              Show help information.
+解决方法：在 iPhone 上用该 Apple ID 在 App Store 点一下下载（不用下载完，点一下就行），然后再次用工具下载。
 
-### 我的其他开源框架
+**搜不到想要的 App**
 
-- [SpeedySwift 独立开发者必备](https://github.com/Tliens/SpeedySwift)
+修改搜索数量（默认 50 条），或换个关键词。
 
-- [CTNet 这是一个可以指定缓存、重试、优先级的轻量级网络库](https://github.com/ours-curiosity/CTNet)
+**Linux 下缺少 tkinter**
 
-- [Localizable 国际化方案](https://github.com/Tliens/Localizable)
+```bash
+sudo apt install python3-tk
+```
 
-- [SpeedyMetal Metal 加速框架，GPUImage3的尝试演化](https://github.com/Tliens/SpeedyMetal)
-
-- [GPUImageByMetal  GPUImage 3 中文注释版](https://github.com/Tliens/GPUImageByMetal)
-
-### Author
-
-tliens, maninios@163.com
+---
 
 ## License
 
-KillBug is available under the MIT license. See the LICENSE file for more info.
+MIT
