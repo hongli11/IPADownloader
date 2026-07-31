@@ -1,0 +1,5 @@
+.deb
+build-*
+__pycache__/
+ipadownloader-deb-stage/
+icon.png
