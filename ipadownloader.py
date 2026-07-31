@@ -166,8 +166,8 @@ def logout_apple() -> tuple[bool, str]:
 
 
 def check_auth() -> tuple[bool, str]:
-    out, err, code = run_cmd([IPA_TOOL, "auth", "status"])
-    if code == 0 and "authenticated" in out.lower():
+    out, err, code = run_cmd([IPA_TOOL, "auth", "info"])
+    if code == 0 and ("name" in out.lower() or "authenticated" in out.lower()):
         return True, out.strip()
     return False, out.strip() or err.strip()
 
