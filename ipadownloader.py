@@ -315,7 +315,7 @@ class MainApp(Tk):
             self._set_status(f"搜索失败: {err[:40]}")
             return
         for name, bundle, subtitle in results:
-            display = f"{name}  —  {bundle}"
+            display = f"{name}  /  {bundle}"
             self.lb.insert("end", display)
             self._results.append((name, bundle, subtitle))
         self._set_status(f"找到 {len(results)} 个结果")
