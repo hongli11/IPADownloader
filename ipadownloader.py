@@ -13,7 +13,7 @@ import tempfile
 import shutil
 
 try:
-    from tkinter import Tk, Label, Entry, Button, Listbox, Scrollbar, Frame, StringVar, IntVar, messagebox, filedialog
+    from tkinter import Tk, Label, Entry, Button, Listbox, Scrollbar, Frame, StringVar, IntVar, Toplevel, messagebox, filedialog
     from tkinter import font as tkfont
     TK_OK = True
 except ImportError:
@@ -347,7 +347,7 @@ class MainApp(Tk):
 
 # ── 登录弹窗 ───────────────────────────────────────────
 
-class LoginDialog(Tk):
+class LoginDialog(Toplevel):
     def __init__(self, parent: MainApp):
         super().__init__()
         self.parent = parent
