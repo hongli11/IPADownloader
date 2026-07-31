@@ -45,14 +45,33 @@ FALLBACK  = "DejaVu Sans"
 
 # ── 工具函数 ──────────────────────────────────────────
 
+import re as _re
+_ANSI = _re.compile(r"\x1b\[[0-9;]*[mK]")
+
+def _strip_ansi(s: str) -> str:
+    return _re.sub(r"\x1b\[[0-9;]*[mK]", "", s)
+
+
+def _ensure_keyring() -> None:
+    """启动 GNOME keyring，让 ipatool 有地方存凭证"""
+    try:
+        import subprocess as _sub
+        if _sub.run(["pgrep", "-f", "gnome-keyring-daemon"],
+                    capture_output=True).returncode != 0:
+            _sub.run(["gnome-keyring-daemon", "--unlock",
+                      "-p", "ipadownloader"],
+                     capture_output=True, timeout=10)
+    except Exception:
+        pass  # keyring 失败也继续
+
 def run_cmd(cmd: list[str], timeout: int = CMD_TIMEOUT) -> tuple[str, str, int]:
-    """执行命令，返回 (stdout, stderr, returncode)"""
+    """执行命令，返回 (stdout, stderr, returncode)，自动去 ANSI 转义"""
     try:
         r = subprocess.run(
             cmd, capture_output=True, text=True, timeout=timeout,
             env={**os.environ, "LC_ALL": "zh_CN.UTF-8"},
         )
-        return r.stdout, r.stderr, r.returncode
+        return _strip_ansi(r.stdout), _strip_ansi(r.stderr), r.returncode
     except subprocess.TimeoutExpired:
         return "", f"命令执行超时 ({timeout}s)", -1
     except FileNotFoundError:
@@ -125,11 +144,15 @@ def download_app(bundle_id: str, dest_dir: str) -> tuple[str, str]:
 
 
 def login_apple(email: str, password: str) -> tuple[bool, str]:
-    """登录 Apple ID，返回 (success, msg)"""
+    """登录 Apple ID，先启动 gnome-keyring 以兼容 ipatool 存凭证"""
+    _ensure_keyring()
     out, err, code = run_cmd([IPA_TOOL, "auth", "login",
-                              "--email", email, "--password", password])
+                              "--email", email, "--password", password,
+                              "--keychain-passphrase", "ipadownloader"])
     if code == 0:
         return True, out.strip() or "登录成功"
+    # 清理失败的登录尝试残留
+    run_cmd([IPA_TOOL, "auth", "revoke"], timeout=30)
     return False, err.strip() or out.strip()
 
 
