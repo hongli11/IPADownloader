@@ -143,15 +143,17 @@ def download_app(bundle_id: str, dest_dir: str) -> tuple[str, str]:
     return "", err.strip() or out.strip()
 
 
-def login_apple(email: str, password: str) -> tuple[bool, str]:
+def login_apple(email: str, password: str, auth_code: str = "") -> tuple[bool, str]:
     """登录 Apple ID，先启动 gnome-keyring 以兼容 ipatool 存凭证"""
     _ensure_keyring()
-    out, err, code = run_cmd([IPA_TOOL, "auth", "login",
-                              "--email", email, "--password", password,
-                              "--keychain-passphrase", "ipadownloader"])
+    cmd = [IPA_TOOL, "auth", "login",
+           "--email", email, "--password", password,
+           "--keychain-passphrase", "ipadownloader"]
+    if auth_code:
+        cmd.extend(["--auth-code", auth_code])
+    out, err, code = run_cmd(cmd)
     if code == 0:
         return True, out.strip() or "登录成功"
-    # 清理失败的登录尝试残留
     run_cmd([IPA_TOOL, "auth", "revoke"], timeout=30)
     return False, err.strip() or out.strip()
 
@@ -412,10 +414,12 @@ class LoginDialog(Toplevel):
         if not email or not pwd:
             messagebox.showwarning("提示", "请填写 Email 和密码")
             return
+        self._email = email
+        self._pwd = pwd
         threading.Thread(target=lambda: self._login_bg(email, pwd), daemon=True).start()
 
-    def _login_bg(self, email: str, pwd: str):
-        ok, msg = login_apple(email, pwd)
+    def _login_bg(self, email: str, pwd: str, code: str = ""):
+        ok, msg = login_apple(email, pwd, code)
         self.after(0, lambda: self._login_done(ok, msg))
 
     def _login_done(self, ok: bool, msg: str):
@@ -426,9 +430,39 @@ class LoginDialog(Toplevel):
             self.parent._set_status("登录成功")
             self._result = (True, msg)
             self._close()
+        elif "2FA" in msg or "auth code" in msg.lower() or "enter 2FA" in msg.lower():
+            self._ask_2fa()
         else:
             self._result = (False, msg)
             messagebox.showerror("登录失败", msg[:200])
+
+    def _ask_2fa(self):
+        v = Toplevel(self)
+        v.title("2FA 验证码")
+        v.geometry("360x180")
+        v.resizable(False, False)
+        v.configure(bg=BG)
+        v.transient(self)
+        v.grab_set()
+
+        Label(v, text="需要双重认证验证码", font=("Microsoft YaHei UI", 12),
+              fg=ACCENT, bg=BG).pack(pady=10)
+        Label(v, text="请在手机/受信任设备上查看 6 位验证码",
+              font=self.parent.F11, fg=WHITE, bg=BG).pack(pady=2)
+        cvar = StringVar()
+        Entry(v, textvariable=cvar, font=self.parent.F11,
+              bg=INPUT_BG, fg=WHITE, show="●", relief="flat", width=18).pack(pady=6)
+
+        def _go():
+            code = cvar.get().strip()
+            if not code:
+                return
+            v.destroy()
+            threading.Thread(
+                target=lambda: self._login_bg(self._email, self._pwd, code), daemon=True).start()
+
+        Button(v, text="验证", command=_go,
+               font=self.parent.F11, bg=ACCENT, fg="white", relief="flat").pack(pady=8)
 
     def _close(self):
         self.destroy()
