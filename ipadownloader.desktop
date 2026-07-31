@@ -1,0 +1,13 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=IPADownloader
+Name[zh_CN]=IPADownloader iOS 应用下载器
+GenericName=iOS App Downloader
+Comment=Download iOS apps (IPA) from App Store
+Comment[zh_CN]=从 App Store 下载 iOS 应用 (IPA)
+Exec=env LANG=zh_CN.UTF-8 /usr/bin/python3 /usr/share/ipadownloader/ipadownloader.py
+Icon=ipadownloader
+Terminal=false
+Categories=Utility;Network;
+Keywords=ios;ipa;app;download;apple;

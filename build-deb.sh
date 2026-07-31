@@ -58,14 +58,16 @@ fi
 cat > "${STAGING}/${PKG}/${VERSION}/usr/share/applications/${PKG}.desktop" << DESKTOP
 [Desktop Entry]
 Version=1.0
+Type=Application
 Name=IPADownloader
+Name[zh_CN]=IPADownloader iOS 应用下载器
 Comment=Download iOS Apps (ipa) from App Store
-Exec=/usr/bin/ipadownloader
+Comment[zh_CN]=从 App Store 下载 iOS 应用 (IPA)
+Exec=env LANG=zh_CN.UTF-8 /usr/bin/ipadownloader
 Icon=ipadownloader
 Terminal=false
-Type=Application
 Categories=Utility;Network;
-MimeType=
+Keywords=ios;ipa;app;download;apple;
 DESKTOP
 
 # ── MAN 页 ─────────────────────────────────────────────

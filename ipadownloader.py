@@ -13,7 +13,7 @@ import tempfile
 import shutil
 
 try:
-    from tkinter import Tk, Label, Entry, Button, Listbox, Scrollbar, Frame, StringVar, IntVar, Messagebox, filedialog
+    from tkinter import Tk, Label, Entry, Button, Listbox, Scrollbar, Frame, StringVar, IntVar, messagebox, filedialog
     from tkinter import font as tkfont
     TK_OK = True
 except ImportError:
@@ -279,7 +279,7 @@ class MainApp(Tk):
 
     def _do_search(self):
         if not self.authenticated:
-            Messagebox.showwarning("提示", "请先登录 Apple ID")
+            messagebox.showwarning("提示", "请先登录 Apple ID")
             return
         q = self.query_var.get().strip()
         if not q:
@@ -307,7 +307,7 @@ class MainApp(Tk):
 
     def _do_download(self):
         if not self.authenticated:
-            Messagebox.showwarning("提示", "请先登录 Apple ID")
+            messagebox.showwarning("提示", "请先登录 Apple ID")
             return
         sel = self.lb.curselection()
         if not sel:
@@ -329,10 +329,10 @@ class MainApp(Tk):
     def _download_done(self, name: str, result: str, err: str):
         if result:
             self._set_status(f"✅ {name} 下载完成")
-            Messagebox.showinfo("下载完成", f"已保存到:\n{self.download_path_var.get()}")
+            messagebox.showinfo("下载完成", f"已保存到:\n{self.download_path_var.get()}")
         else:
             self._set_status(f"❌ 下载失败")
-            Messagebox.showerror("下载失败", err[:200])
+            messagebox.showerror("下载失败", err[:200])
 
     def _choose_dir(self):
         d = filedialog.askdirectory(title="选择下载目录")
@@ -387,7 +387,7 @@ class LoginDialog(Tk):
         email = self.email_var.get().strip()
         pwd = self.pwd_var.get()
         if not email or not pwd:
-            Messagebox.showwarning("提示", "请填写 Email 和密码")
+            messagebox.showwarning("提示", "请填写 Email 和密码")
             return
         threading.Thread(target=lambda: self._login_bg(email, pwd), daemon=True).start()
 
@@ -405,7 +405,7 @@ class LoginDialog(Tk):
             self._close()
         else:
             self._result = (False, msg)
-            Messagebox.showerror("登录失败", msg[:200])
+            messagebox.showerror("登录失败", msg[:200])
 
     def _close(self):
         self.destroy()
