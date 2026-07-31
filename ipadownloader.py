@@ -129,7 +129,8 @@ def search_apps(query: str) -> tuple[list[tuple[str, str, str]], str]:
 def download_app(bundle_id: str, dest_dir: str) -> tuple[str, str]:
     """下载 ipa，返回 (result_msg, error_msg)"""
     os.makedirs(dest_dir, exist_ok=True)
-    out, err, code = run_cmd([IPA_TOOL, "download", "-b", bundle_id, "--output", dest_dir])
+    # 大 App 下载可能需要 10 分钟以上，给足时间
+    out, err, code = run_cmd([IPA_TOOL, "download", "-b", bundle_id, "--output", dest_dir], timeout=600)
     if code == 0:
         return "下载成功", ""
     return "", err.strip() or out.strip()
