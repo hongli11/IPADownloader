@@ -235,7 +235,7 @@ class MainApp(Tk):
         self.lb = Listbox(list_f, font=self.F10, bg=BG, fg=WHITE,
                           selectbackground=ACCENT, selectforeground="white",
                           activestyle="none", relief="flat",
-                          exportselection=False)
+                          exportselection=False, linesep="\n")
         lb_scroll = Scrollbar(list_f, orient="vertical", command=self.lb.yview, bg=SURFACE, troughcolor=SURFACE)
         lb_scroll.pack(side="right", fill="y")
         self.lb.configure(yscrollcommand=lb_scroll.set)
@@ -315,9 +315,7 @@ class MainApp(Tk):
             self._set_status(f"搜索失败: {err[:40]}")
             return
         for name, bundle, subtitle in results:
-            display = f"{name}"
-            if subtitle:
-                display += f"  — {subtitle}"
+            display = f"{name}\n  {bundle}"
             self.lb.insert("end", display)
             self._results.append((name, bundle, subtitle))
         self._set_status(f"找到 {len(results)} 个结果")
