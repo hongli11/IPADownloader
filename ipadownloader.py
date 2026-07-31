@@ -244,17 +244,17 @@ class MainApp(Tk):
     # ── 字体 ───────────────────────────────────────────
 
     def _make_font(self):
-        f = font.Font(family=FONT_NAME, size=10)
+        f = tkfont.Font(family=FONT_NAME, size=10)
         try:
-            f.actual()  # 测试可用
+            f.actual()
         except Exception:
-            f = font.Font(family=FALLBACK, size=10)
-        self.F10 = font.Font(family=f.cget("family"), size=10)
-        self.F11 = font.Font(family=f.cget("family"), size=11)
-        self.F12 = font.Font(family=f.cget("family"), size=12)
-        self.F14 = font.Font(family=f.cget("family"), size=14)
-        self.F16_B = font.Font(family=f.cget("family"), size=14, weight="bold")
-        self.F14_B = font.Font(family=f.cget("family"), size=12, weight="bold")
+            f = tkfont.Font(family=FALLBACK, size=10)
+        self.F10 = tkfont.Font(family=f.cget("family"), size=10)
+        self.F11 = tkfont.Font(family=f.cget("family"), size=11)
+        self.F12 = tkfont.Font(family=f.cget("family"), size=12)
+        self.F14 = tkfont.Font(family=f.cget("family"), size=14)
+        self.F16_B = tkfont.Font(family=f.cget("family"), size=14, weight="bold")
+        self.F14_B = tkfont.Font(family=f.cget("family"), size=12, weight="bold")
 
     # ── 操作 ───────────────────────────────────────────
 
