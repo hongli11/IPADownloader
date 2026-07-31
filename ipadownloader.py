@@ -96,36 +96,28 @@ def check_ipatool() -> tuple[bool, str]:
 
 
 def parse_search_results(text: str) -> list[tuple[str, str, str]]:
-    """
-    解析 ipatool search 输出，返回 [(name, bundle_id, subtitle), ...]
-    """
-    results = []
+    """解析 ipatool search 输出（日志包 JSON 数组），返回 [(name, bundle_id, subtitle), ...]"""
+    text = _strip_ansi(text)
+    results: list[tuple[str, str, str]] = []
+    data = None
     try:
-        # 新 ipatool 返回 JSON
         data = json.loads(text)
-        for app in data:
-            name = app.get("name", "")
-            bundle = app.get("bundleIdentifier", "")
-            subtitle = app.get("subtitle", "")
-            if name and bundle:
-                results.append((name, bundle, subtitle))
-        return results
     except json.JSONDecodeError:
-        # 老版本文本格式
-        lines = text.strip().split("\n")
-        for line in lines:
-            # 格式: "Name  | Bundle ID"
-            parts = line.split("|")
-            if len(parts) >= 2:
-                name = parts[0].strip()
-                bundle = parts[1].strip()
-                if name and bundle:
-                    results.append((name, bundle, ""))
         return results
+    if isinstance(data, dict):
+        data = data.get("apps")
+    if not isinstance(data, list):
+        return results
+    for app in data:
+        name = app.get("name", "")
+        bundle = app.get("bundleID", "") or app.get("bundleIdentifier", "")
+        if name and bundle:
+            results.append((name, bundle, ""))
+    return results
 
 
 def search_apps(query: str) -> tuple[list[tuple[str, str, str]], str]:
-    out, err, code = run_cmd([IPA_TOOL, "search", "--limit", str(MAX_SEARCH), query])
+    out, err, code = run_cmd([IPA_TOOL, "search", "--limit", str(MAX_SEARCH), "--format", "json", query])
     if code != 0:
         return [], err.strip() or out.strip() or "未知错误"
     results = parse_search_results(out)
